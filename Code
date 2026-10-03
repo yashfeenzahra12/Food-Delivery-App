@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Food Delivery App</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f7f7f7;
+            color: #333;
+        }
+
+        /* Header */
+
+        header {
+            background: #ff5722;
+            color: white;
+            padding: 18px 6%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .cart-button {
+            border: none;
+            background: white;
+            color: #ff5722;
+            padding: 10px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Hero */
+
+        .hero {
+            background: linear-gradient(
+                rgba(0,0,0,0.45),
+                rgba(0,0,0,0.45)
+            ),
+            url("https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1400&q=80");
+
+            background-size: cover;
+            background-position: center;
+
+            height: 300px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            font-size: 18px;
+        }
+
+        /* Search */
+
+        .search-section {
+            padding: 25px 6%;
+            text-align: center;
+        }
+
+        .search-section input {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        /* Categories */
+
+        .categories {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 0 6% 25px;
+        }
+
+        .category-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 20px;
+            background: white;
+            color: #ff5722;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+
+        .category-btn:hover {
+            background: #ff5722;
+            color: white;
+        }
+
+        /* Food Cards */
+
+        .food-container {
+            padding: 0 6% 40px;
+
+            display: grid;
+            grid-template-columns:
+                repeat(auto-fit, minmax(230px, 1fr));
+
+            gap: 25px;
+        }
+
+        .food-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+
+        .food-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .food-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .food-info {
+            padding: 18px;
+        }
+
+        .food-info h3 {
+            margin-bottom: 8px;
+        }
+
+        .food-info p {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .food-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price {
+            color: #ff5722;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .add-btn {
+            background: #ff5722;
+            color: white;
+            border: none;
+            padding: 9px 13px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .add-btn:hover {
+            background: #e64a19;
+        }
+
+        /* Cart */
+
+        .cart {
+            position: fixed;
+            right: -400px;
+            top: 0;
+
+            width: 380px;
+            max-width: 90%;
+
+            height: 100vh;
+
+            background: white;
+
+            box-shadow:
+                -5px 0 20px rgba(0,0,0,0.2);
+
+            z-index: 200;
+
+            padding: 25px;
+
+            transition: 0.4s;
+
+            overflow-y: auto;
+        }
+
+        .cart.active {
+            right: 0;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .close-cart {
+            border: none;
+            background: #eee;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            padding: 12px 0;
+
+            border-bottom: 1px solid #ddd;
+        }
+
+        .cart-item h4 {
+            margin-bottom: 5px;
+        }
+
+        .quantity {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quantity button {
+            border: none;
+            background: #ff5722;
+            color: white;
+
+            width: 25px;
+            height: 25px;
+
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .cart-total {
+            margin-top: 25px;
+            padding-top: 20px;
+
+            border-top: 2px solid #ddd;
+
+            font-size: 20px;
+            font-weight: bold;
+
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            margin-top: 20px;
+
+            padding: 14px;
+
+            border: none;
+            border-radius: 8px;
+
+            background: #28a745;
+            color: white;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            cursor: pointer;
+        }
+
+        .checkout-btn:hover {
+            background: #218838;
+        }
+
+        .empty-cart {
+            text-align: center;
+            color: #888;
+            padding: 30px 0;
+        }
+
+        /* Footer */
+
+        footer {
+            background: #222;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        /* Mobile */
+
+        @media (max-width: 600px) {
+
+            header {
+                padding: 15px 4%;
+            }
+
+            .hero h1 {
+                font-size: 30px;
+            }
+
+            .hero {
+                height: 250px;
+            }
+
+            .cart {
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+
+    <header>
+
+        <div class="logo">
+            🍔 FoodExpress
+        </div>
+
+        <button
+            class="cart-button"
+            onclick="openCart()"
+        >
+            🛒 Cart
+            <span id="cartCount">0</span>
+        </button>
+
+    </header>
+
+
+    <!-- Hero -->
+
+    <section class="hero">
+
+        <h1>Delicious Food Delivered</h1>
+
+        <p>
+            Order your favorite meals from the comfort of your home.
+        </p>
+
+    </section>
+
+
+    <!-- Search -->
+
+    <section class="search-section">
+
+        <input
+            type="text"
+            id="search"
+            placeholder="🔍 Search for food..."
+            onkeyup="searchFood()"
+        >
+
+    </section>
+
+
+    <!-- Categories -->
+
+    <div class="categories">
+
+        <button
+            class="category-btn"
+            onclick="filterFood('All')"
+        >
+            All
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('Pizza')"
+        >
+            🍕 Pizza
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('Burger')"
+        >
+            🍔 Burger
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('Chicken')"
+        >
+            🍗 Chicken
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('Dessert')"
+        >
+            🍰 Dessert
+        </button>
+
+        <button
+            class="category-btn"
+            onclick="filterFood('Drinks')"
+        >
+            🥤 Drinks
+        </button>
+
+    </div>
+
+
+    <!-- Food Items -->
+
+    <main
+        class="food-container"
+        id="foodContainer"
+    ></main>
+
+
+    <!-- Shopping Cart -->
+
+    <div
+        class="cart"
+        id="cart"
+    >
+
+        <div class="cart-header">
+
+            <h2>🛒 Your Cart</h2>
+
+            <button
+                class="close-cart"
+                onclick="closeCart()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <div id="cartItems"></div>
+
+        <div class="cart-total">
+
+            <span>Total</span>
+
+            <span id="cartTotal">
+                Rs. 0
+            </span>
+
+        </div>
+
+        <button
+            class="checkout-btn"
+            onclick="checkout()"
+        >
+            Proceed to Checkout
+        </button>
+
+    </div>
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <p>
+            © 2026 FoodExpress | Web Technologies Project
+        </p>
+
+    </footer>
+
+
+    <script>
+
+        // Food database
+
+        const foods = [
+
+            {
+                id: 1,
+                name: "Chicken Pizza",
+                category: "Pizza",
+                price: 899,
+                image:
+                "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?auto=format&fit=crop&w=600&q=80",
+                description: "Cheesy chicken pizza with fresh toppings."
+            },
+
+            {
+                id: 2,
+                name: "Beef Burger",
+                category: "Burger",
+                price: 499,
+                image:
+                "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=600&q=80",
+                description: "Juicy beef burger with cheese and vegetables."
+            },
+
+            {
+                id: 3,
+                name: "Fried Chicken",
+                category: "Chicken",
+                price: 699,
+                image:
+                "https://images.unsplash.com/photo-1626082927389-6cd097cdc6ec?auto=format&fit=crop&w=600&q=80",
+                description: "Crispy fried chicken served hot and fresh."
+            },
+
+            {
+                id: 4,
+                name: "Chocolate Cake",
+                category: "Dessert",
+                price: 399,
+                image:
+                "https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=600&q=80",
+                description: "Soft and delicious chocolate cake."
+            },
+
+            {
+                id: 5,
+                name: "French Fries",
+                category: "Burger",
+                price: 249,
+                image:
+                "https://images.unsplash.com/photo-1573080496219-bb080dd4f877?auto=format&fit=crop&w=600&q=80",
+                description: "Golden crispy french fries."
+            },
+
+            {
+                id: 6,
+                name: "Cold Drink",
+                category: "Drinks",
+                price: 149,
+                image:
+                "https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?auto=format&fit=crop&w=600&q=80",
+                description: "Refreshing chilled soft drink."
+            },
+
+            {
+                id: 7,
+                name: "Pepperoni Pizza",
+                category: "Pizza",
+                price: 999,
+                image:
+                "https://images.unsplash.com/photo-1628840042765-356cda07504e?auto=format&fit=crop&w=600&q=80",
+                description: "Classic pizza topped with pepperoni and cheese."
+            },
+
+            {
+                id: 8,
+                name: "Ice Cream",
+                category: "Dessert",
+                price: 299,
+                image:
+                "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=600&q=80",
+                description: "Creamy and delicious ice cream."
+            }
+
+        ];
+
+
+        // Shopping cart
+
+        let cart = [];
+
+
+        // Display food
+
+        function displayFoods(foodList) {
+
+            const container =
+                document.getElementById("foodContainer");
+
+            container.innerHTML = "";
+
+
+            foodList.forEach(food => {
+
+                const card =
+                    document.createElement("div");
+
+                card.className = "food-card";
+
+
+                card.innerHTML = `
+
+                    <img
+                        src="${food.image}"
+                        alt="${food.name}"
+                    >
+
+                    <div class="food-info">
+
+                        <h3>
+                            ${food.name}
+                        </h3>
+
+                        <p>
+                            ${food.description}
+                        </p>
+
+                        <div class="food-bottom">
+
+                            <span class="price">
+                                Rs. ${food.price}
+                            </span>
+
+                            <button
+                                class="add-btn"
+                                onclick="addToCart(${food.id})"
+                            >
+                                Add
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+
+                container.appendChild(card);
+
+            });
+
+        }
+
+
+        // Add food to cart
+
+        function addToCart(id) {
+
+            const food =
+                foods.find(item => item.id === id);
+
+
+            const existing =
+                cart.find(item => item.id === id);
+
+
+            if (existing) {
+
+                existing.quantity++;
+
+            } else {
+
+                cart.push({
+
+                    ...food,
+
+                    quantity: 1
+
+                });
+
+            }
+
+
+            updateCart();
+
+        }
+
+
+        // Update cart
+
+        function updateCart() {
+
+            const cartItems =
+                document.getElementById("cartItems");
+
+            const cartCount =
+                document.getElementById("cartCount");
+
+            const cartTotal =
+                document.getElementById("cartTotal");
+
+
+            cartItems.innerHTML = "";
+
+
+            let total = 0;
+
+            let count = 0;
+
+
+            if (cart.length === 0) {
+
+                cartItems.innerHTML =
+                    '<p class="empty-cart">Your cart is empty.</p>';
+
+            }
+
+
+            cart.forEach(item => {
+
+                total +=
+                    item.price * item.quantity;
+
+                count += item.quantity;
+
+
+                const div =
+                    document.createElement("div");
+
+                div.className = "cart-item";
+
+
+                div.innerHTML = `
+
+                    <div>
+
+                        <h4>
+                            ${item.name}
+                        </h4>
+
+                        <small>
+                            Rs. ${item.price}
+                        </small>
+
+                    </div>
+
+                    <div class="quantity">
+
+                        <button
+                            onclick="changeQuantity(
+                                ${item.id}, -1
+                            )"
+                        >
+                            -
+                        </button>
+
+                        <span>
+                            ${item.quantity}
+                        </span>
+
+                        <button
+                            onclick="changeQuantity(
+                                ${item.id}, 1
+                            )"
+                        >
+                            +
+                        </button>
+
+                    </div>
+                `;
+
+
+                cartItems.appendChild(div);
+
+            });
+
+
+            cartCount.innerText = count;
+
+            cartTotal.innerText =
+                "Rs. " + total.toFixed(2);
+
+        }
+
+
+        // Change quantity
+
+        function changeQuantity(id, change) {
+
+            const item =
+                cart.find(item => item.id === id);
+
+
+            if (!item) {
+                return;
+            }
+
+
+            item.quantity += change;
+
+
+            if (item.quantity <= 0) {
+
+                cart =
+                    cart.filter(
+                        item => item.id !== id
+                    );
+
+            }
+
+
+            updateCart();
+
+        }
+
+
+        // Open cart
+
+        function openCart() {
+
+            document
+                .getElementById("cart")
+                .classList.add("active");
+
+        }
+
+
+        // Close cart
+
+        function closeCart() {
+
+            document
+                .getElementById("cart")
+                .classList.remove("active");
+
+        }
+
+
+        // Search food
+
+        function searchFood() {
+
+            const search =
+                document
+                .getElementById("search")
+                .value
+                .toLowerCase();
+
+
+            const filtered =
+                foods.filter(food =>
+                    food.name
+                    .toLowerCase()
+                    .includes(search)
+                );
+
+
+            displayFoods(filtered);
+
+        }
+
+
+        // Filter categories
+
+        function filterFood(category) {
+
+            if (category === "All") {
+
+                displayFoods(foods);
+
+                return;
+
+            }
+
+
+            const filtered =
+                foods.filter(
+                    food => food.category === category
+                );
+
+
+            displayFoods(filtered);
+
+        }
+
+
+        // Checkout
+
+        function checkout() {
+
+            if (cart.length === 0) {
+
+                alert("Your cart is empty!");
+
+                return;
+
+            }
+
+
+            let total = 0;
+
+
+            cart.forEach(item => {
+
+                total +=
+                    item.price * item.quantity;
+
+            });
+
+
+            alert(
+                "Order placed successfully! 🍔\n\n" +
+                "Total Amount: Rs. " +
+                total.toFixed(2)
+            );
+
+
+            cart = [];
+
+            updateCart();
+
+            closeCart();
+
+        }
+
+
+        // Initial display
+
+        displayFoods(foods);
+
+        updateCart();
+
+    </script>
+
+</body>
+</html>
